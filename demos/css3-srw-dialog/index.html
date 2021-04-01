@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      background: black;
+    }
+
+    .srw-panel {
+      --c-width: 400;
+      --c-height: 200;
+      --c-margin: 10;
+      --c-wave-speed: 30;
+
+      --content-width: calc(1px * var(--c-width));
+      --content-height: calc(1px * var(--c-height));
+      --content-margin: calc(1px * var(--c-margin));
+      
+      --inner-width: calc(calc(calc(var(--content-margin) * 2) + var(--content-width)) + 3px);
+      --inner-height: calc(calc(var(--content-margin) * 2) + var(--content-height));
+      --inner-margin-left: 5px;
+      --inner-margin-top: 1px;
+
+      --inner-mask-top: 6px;
+      --inner-mask-height: calc(var(--inner-height) - calc(2 * var(--inner-mask-top)));
+
+      --outer-width: calc(calc(calc(var(--inner-margin-left) * 2) + var(--inner-width)) + 0px);
+      --outer-height: calc(calc(var(--inner-margin-top) * 2) + var(--inner-height));
+
+      --line-wave-width: 30px;
+      --line-wave-anime-duration: calc(1s * calc(calc(var(--c-width) + calc(var(--c-margin) * 2)) / var(--c-wave-speed)));
+      --line-wave-top: 1px;
+      --line-wave-height: calc(var(--outer-height) - calc(var(--line-wave-top) * 2));
+
+      position: relative;
+      display: inline-block;
+      width: var(--outer-width);
+      height: var(--outer-height);
+    }
+
+    /* 窗体内部（有效大小，光波扫描的大小） */
+    .srw-panel .inner {
+      width: var(--inner-width);
+      height: var(--inner-height);
+      position: absolute;
+      top: var(--inner-margin-top);
+      left: var(--inner-margin-left);
+      background-color: rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+
+      box-sizing: border-box;
+      border-left: solid 2px #0000ff;
+      border-right: solid 2px #0000ff;
+    }
+    /* 波动线 */
+    .srw-panel .inner:before {
+      content: '';
+      position: absolute;
+      display: block;
+      width: var(--line-wave-width);
+      height: var(--line-wave-height);
+      top: var(--line-wave-top);
+      left: calc(-1 * var(--line-wave-width));
+      background: linear-gradient(to right, rgba(0, 255, 0, 0), rgba(0, 255, 0, 0.7));
+      animation-name: line;
+      /* animation-duration: 10s; */
+      animation-duration: var(--line-wave-anime-duration);
+      animation-delay: 0.5s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+    @keyframes line {
+      0% {
+        left: calc(-1 * var(--line-wave-width));
+        background: linear-gradient(to right, rgba(0, 255, 0, 0), rgba(0, 255, 0, 0.7));
+      }
+      30% {
+        left: 100%;
+        background: linear-gradient(to right, rgba(0, 255, 0, 0), rgba(0, 255, 0, 0.7));
+      }
+      50% {
+        left: 100%;
+        background: linear-gradient(to left, rgba(0, 255, 0, 0), rgba(0, 255, 0, 0.7));
+      }
+      80% {
+        left: calc(-1 * var(--line-wave-width));
+        background: linear-gradient(to left, rgba(0, 255, 0, 0), rgba(0, 255, 0, 0.7));
+      }
+    }
+
+    /* 内容蒙版（光波减弱的区域） */
+    .srw-panel .inner-mask {
+      position: absolute;
+      background:rgba(0, 0, 0, 0.7);
+      width: var(--inner-width);
+      height: var(--inner-mask-height);
+      margin-top: var(--inner-mask-top);
+
+      box-sizing: border-box;
+      border-top: solid 2px #3a3963;
+      border-bottom: solid 2px #3a3963;
+    }
+
+    /* 内容 */
+    .srw-panel .content {
+      position: absolute;
+      width: var(--content-width);
+      height: var(--content-height);
+      color: white;
+      margin: var(--content-margin);
+    }
+    
+    /* 装饰 - 顶部管道 */
+    .srw-panel .block-top {
+      position: absolute;
+      left: 5px;
+      top: 1px;
+      height: 1px;
+      width: calc(var(--outer-width) - 10px);
+      background: gray;
+    }
+    .srw-panel .block-top::after {
+      content: '';
+      position: absolute;
+      left: 0px;
+      top: 5px;
+      height: 1px;
+      width: calc(var(--outer-width) - 10px);
+      background: gray;
+    }
+    /* 装饰 - 底部管道 */
+    .srw-panel .block-bottom {
+      position: absolute;
+      left: 5px;
+      top: calc(var(--outer-height) - 7px);
+      height: 1px;
+      width: calc(var(--outer-width) - 10px);
+      background: gray;
+    }
+    .srw-panel .block-bottom::after {
+      content: '';
+      position: absolute;
+      left: 0px;
+      top: 5px;
+      height: 1px;
+      width: calc(var(--outer-width) - 10px);
+      background: gray;
+    }
+    /* 装饰 - 四个角的管道图标 */
+    .srw-panel .pipe-icon {
+      width: 30px;
+      height: 30px;
+      position: absolute;
+    }
+    .srw-panel .pipe-icon.pipe-top-left {
+      left: 0px;
+      top: 0px;
+      background-image: url(./imgs/pipe-top-left.png);
+    }
+    .srw-panel .pipe-icon.pipe-bottom-left {
+      left: 0px;
+      top: calc(var(--outer-height) - 30px);
+      background-image: url(./imgs/pipe-bottom-left.png);
+    }
+    .srw-panel .pipe-icon.pipe-top-right {
+      left: calc(var(--outer-width) - 30px);
+      top: 0px;
+      background-image: url(./imgs/pipe-top-right.png);
+    }
+    .srw-panel .pipe-icon.pipe-bottom-right {
+      left: calc(var(--outer-width) - 30px);
+      top: calc(var(--outer-height) - 30px);
+      background-image: url(./imgs/pipe-bottom-right.png);
+    }
+  </style>
+</head>
+<body>
+  <div class="srw-panel">
+    <div class="inner">
+      <div class="inner-mask"></div>
+      <div class="content">
+        机战alpha对话框<br/>
+        ----------------------------------<br/>
+        使用纯css3动画+变量完成<br/>
+        光波扫描动画执行时间是计算出来的<br/>
+        可以与下方窗口比较，速度基本是一致的
+      </div>
+    </div>
+
+    <!-- 顶部、底部管道遮盖 -->
+    <div class="block-top"></div>
+    <div class="block-bottom"></div>
+
+    <!-- 四个角的图标 -->
+    <div class="pipe-icon pipe-top-left"></div>
+    <div class="pipe-icon pipe-top-right"></div>
+    <div class="pipe-icon pipe-bottom-left"></div>
+    <div class="pipe-icon pipe-bottom-right"></div>
+  </div>
+
+  <div class="srw-panel" style="--c-width: 600; --c-height: 400;">
+    <div class="inner">
+      <div class="inner-mask"></div>
+      <div class="content">
+        「スーパーロボット大戦α」　対話ボックス<br/>
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝<br/>
+        自定义高度宽度<br/>
+        通过 style="--c-width: 600; --c-height: 400;" <br/>
+        brbrbrbrbr...<br/>
+        brbrbrbrbr...brbrbrbrbr...<br/>
+        brbrbrbrbr...<br/>
+        brbrbrbrbr...brbrbrbrbr...<br/>
+        brbrbrbrbr...<br/>
+        brbrbrbrbr...brbrbrbrbr...<br/>
+        brbrbrbrbr...<br/>
+        brbrbrbrbr...brbrbrbrbr...<br/>
+        brbrbrbrbr...<br/>
+        brbrbrbrbr...brbrbrbrbr...<br/>
+        brbrbrbrbr...<br/>
+        brbrbrbrbr...brbrbrbrbr...<br/>
+        brbrbrbrbr...<br/>
+        brbrbrbrbr...brbrbrbrbr...<br/>
+        超过高度应该会被切掉<br/>
+      </div>
+    </div>
+
+    <!-- 顶部、底部管道遮盖 -->
+    <div class="block-top"></div>
+    <div class="block-bottom"></div>
+
+    <!-- 四个角的图标 -->
+    <div class="pipe-icon pipe-top-left"></div>
+    <div class="pipe-icon pipe-top-right"></div>
+    <div class="pipe-icon pipe-bottom-left"></div>
+    <div class="pipe-icon pipe-bottom-right"></div>
+  </div>
+</body>
+</html>
